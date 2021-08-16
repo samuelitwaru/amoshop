@@ -198,7 +198,6 @@ class SellingWidget(QWidget):
 
     def load_products_2(self):
         self.productsTable.setRowCount(len(self.products))
-        print(len(self.products))
         row = 0
         for product in self.products:
             addToCartButton = QPushButton(text="+")
