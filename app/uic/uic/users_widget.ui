@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>658</width>
+    <height>416</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" stretch="0,0">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="font">
+            <font>
+             <pointsize>14</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Users</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="usersTable">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>ID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Email</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Telephone</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QFrame" name="frame">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>New User</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>297</width>
+            <height>269</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="createUserScroll"/>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="createUserMessageLabel">
+         <property name="styleSheet">
+          <string notr="true">color:green;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="createUserButton">
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_3">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QFrame" name="frame_4">
+         <property name="styleSheet">
+          <string notr="true">background:white;</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>100</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">image: url(:/newPrefix/user.png);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_5" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QLabel" name="userIdLabel">
+               <property name="text">
+                <string>ID</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="userNameLabel">
+               <property name="text">
+                <string>NAME</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="userEmailLabel">
+               <property name="text">
+                <string>EMAIL</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="userTelephoneLabel">
+               <property name="text">
+                <string>TELEPHONE</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_2">
+               <property name="text">
+                <string>Deactivate</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="deleteUserButton">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>89</width>
+              <height>26</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="newUserButton">
+            <property name="text">
+             <string>New User</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../res/rcc/user.qrc"/>
+ </resources>
+ <connections/>
+</ui>

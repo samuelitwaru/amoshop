@@ -1,0 +1,23 @@
+primary = "blue"
+secondary = "grey"
+success = "green"
+info = "indigo"
+warning = "orange"
+danger = "red"
+light = "#"
+dark = "#000000"
+white = "#ffffff"
+transparent = "#"
+
+
+bg_primary = f"background: {primary};"
+bg_secondary = f"background: {secondary};"
+bg_success = f"background: {success};"
+bg_info = f"background: {info};"
+bg_warning = f"background: {warning};"
+bg_danger = f"background: {danger};"
+bg_light = f"background: {light};"
+bg_dark = f"background: {dark};"
+bg_white = f"background: {white};"
+bg_transparent = f"background: {transparent};"
+
