@@ -13,7 +13,6 @@ class LoginForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "samit"
         },
         "password": {
             "label": "Email",
@@ -21,7 +20,6 @@ class LoginForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit,
-            "default": "123"
         },
     }
 
@@ -35,7 +33,6 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "Okot Smith"
         },
         "email": {
             "label": "Email",
@@ -43,7 +40,6 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "okotsmith@gmail.com"
         },
         "telephone": {
             "label": "Telephone",
@@ -51,7 +47,6 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "077483822"
         },
         "username": {
             "label": "Username",
@@ -59,7 +54,6 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "okotsmith"
         },
         "password": {
             "label": "Password",
@@ -67,7 +61,6 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit,
-            "default": "123"
         },
         "confirm_password": {
             "label": "Confirm Password",
@@ -75,7 +68,6 @@ class CreateUserForm(Form):
             "validators": [EqualTo("password"), IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit,
-            "default": "123"
         },
 
         "roles": {
@@ -84,7 +76,7 @@ class CreateUserForm(Form):
             "validators": [IsRequired()],
             "choices": {
                 "admin": {"label": "Admin"},
-                "cashier": {"label": "Cashier", "checked":True},
+                "cashier": {"label": "Cashier"},
             },
             "data_processor": None,
             "widget": QSelect,

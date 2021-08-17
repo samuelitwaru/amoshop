@@ -13,7 +13,6 @@ class CreateProductForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "Bread",
         },
         "brand": {
             "label": "Brand Name",
@@ -21,7 +20,6 @@ class CreateProductForm(Form):
             "validators": [],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "Tip Top",
         },
         "description": {
             "label": "Description",
@@ -43,7 +41,6 @@ class CreateProductForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QIntegerEdit,
-            "default": "4000",
         },
         "selling_price": {
             "label": "Sell Price",
@@ -51,7 +48,6 @@ class CreateProductForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QIntegerEdit,
-            "default": "5000",
         },
         "units": {
             "label": "Units",
@@ -59,7 +55,6 @@ class CreateProductForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "Loaves",
         }
     }
 

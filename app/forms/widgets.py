@@ -33,6 +33,9 @@ class QSelect(QWidget):
     		self.layout.addWidget(cb)
     		self.choices[k]["widget"] = cb
 
+    def clear(self):
+        pass
+
     def get_data(self):
     	data = dict()
     	for k, v in self.choices.items():
