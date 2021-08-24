@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="login_page">
+    <file>login_page.ui</file>
+  </qresource>
+</RCC>

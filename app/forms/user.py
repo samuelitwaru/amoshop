@@ -1,6 +1,6 @@
 from .form import Form
 from .validators import *
-from .widgets import QPasswordEdit, QSelect
+from .widgets import QPasswordEdit, QSelect, QIntegerEdit
 from PyQt5 import QtWidgets as w 
 
 
@@ -15,7 +15,7 @@ class LoginForm(Form):
             "widget": w.QLineEdit,
         },
         "password": {
-            "label": "Email",
+            "label": "Password",
             "data_type": str,
             "validators": [IsRequired()],
             "data_processor": None,
@@ -37,7 +37,7 @@ class CreateUserForm(Form):
         "email": {
             "label": "Email",
             "data_type": str,
-            "validators": [IsRequired()],
+            "validators": [IsRequired(), Email()],
             "data_processor": None,
             "widget": w.QLineEdit,
         },
@@ -46,7 +46,7 @@ class CreateUserForm(Form):
             "data_type": str,
             "validators": [IsRequired()],
             "data_processor": None,
-            "widget": w.QLineEdit,
+            "widget": QIntegerEdit,
         },
         "username": {
             "label": "Username",
@@ -107,5 +107,70 @@ class UpdateUserPasswordForm(Form):
             "validators": [EqualTo("new_password", msg="Passwords do not match"), IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit
+        },
+    }
+
+
+
+class RegisterAsAdminForm(Form):
+    
+    fields = {
+        "name": {
+            "label": "Full Name",
+            "data_type": str,
+            "validators": [IsRequired()],
+            "data_processor": None,
+            "widget": w.QLineEdit,
+            "default": "Samuel Itwaru"
+        },
+        "email": {
+            "label": "Email",
+            "data_type": str,
+            "validators": [IsRequired(), Email()],
+            "data_processor": None,
+            "widget": w.QLineEdit,
+            "default": "samuelitwaru@gmail.com"
+        },
+        "telephone": {
+            "label": "Telephone",
+            "data_type": str,
+            "validators": [IsRequired()],
+            "data_processor": None,
+            "widget": QIntegerEdit,
+            "default": "077384823"
+        },
+        "username": {
+            "label": "Username",
+            "data_type": str,
+            "validators": [IsRequired()],
+            "data_processor": None,
+            "widget": w.QLineEdit,
+            "default": "samit"
+        },
+        "password": {
+            "label": "Password",
+            "data_type": str,
+            "validators": [IsRequired()],
+            "data_processor": None,
+            "widget": QPasswordEdit,
+            "default": "123"
+        },
+        "confirm_password": {
+            "label": "Confirm Password",
+            "data_type": str,
+            "validators": [EqualTo("password"), IsRequired()],
+            "data_processor": None,
+            "widget": QPasswordEdit,
+            "default": "123"
+        },
+        "roles": {
+            "label": "Roles",
+            "data_type": list,
+            "validators": [IsRequired()],
+            "choices": {
+                "admin": {"label": "Admin", "checked": True},
+            },
+            "data_processor": None,
+            "widget": QSelect,
         },
     }

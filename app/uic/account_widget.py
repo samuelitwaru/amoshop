@@ -7,16 +7,17 @@ from PyQt5.uic import loadUi
 from app import app
 from app.forms.user import UpdateUserPasswordForm
 from app.workers import UpdateUserPasswordWorker
+from app.uic.uic.account_widget import Ui_Form
 
 
 class AccountWidget(QWidget):
     def __init__(self, *args):
         super(AccountWidget, self).__init__(*args)
-        loadUi('app/uic/uic/account_widget.ui', self) 
-
-        self.update_user_password_form = UpdateUserPasswordForm(self.scrollLayout)
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+        self.update_user_password_form = UpdateUserPasswordForm(self.ui.scrollLayout)
         self.update_user_password_form.layout_field_widgets()
-        self.submitButton.clicked.connect(self.submit)
+        self.ui.submitButton.clicked.connect(self.submit)
 
     def submit(self):
         data = {
@@ -36,17 +37,17 @@ class AccountWidget(QWidget):
 
 
     def onStarted(self):
-        self.progressLabel.setText("Please wait...")
+        self.ui.progressLabel.setText("Please wait...")
 
     def onSuccess(self):
         reply = QMessageBox.information(self,
                 "Information", "Password was changed successfully.")
         if reply == QMessageBox.Ok:
-            self.progressLabel.setText("")
+            self.ui.progressLabel.setText("")
             self.update_user_password_form.clear()
 
     def onError(self, message):
         errors = message.get("message")
         self.update_user_password_form.errors = errors
         self.update_user_password_form.show_errors()
-        self.progressLabel.setText("")
+        self.ui.progressLabel.setText("")

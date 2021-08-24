@@ -1,3 +1,5 @@
+import re
+
 class IsRequired:
     
     def __init__(self, msg="This field is required"):
@@ -5,6 +7,17 @@ class IsRequired:
 
     def validate(self, form_data, str_data):
         if bool(str_data):
+            return True, str_data
+        return False, self.msg
+
+class Email:
+    
+    def __init__(self, msg="Invalid email address"):
+        self.msg = msg
+
+    def validate(self, form_data, str_data):
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.fullmatch(regex, str_data):
             return True, str_data
         return False, self.msg
 

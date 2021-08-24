@@ -95,3 +95,22 @@ class DeleteUserWorker(QThread):
             self.onSuccess.emit(msg)
         else:
             self.onError.emit(msg)
+
+
+class UpdateUserWorker(QThread):
+    onStarted = pyqtSignal()
+    onSuccess = pyqtSignal(list)
+    onError = pyqtSignal(dict)
+
+    def __init__(self, user_id, data):
+        super().__init__()
+        self.user_id = user_id
+        self.data = data
+
+    def run(self):
+        res = api.update_user(self.user_id, self.data)
+        msg = json.loads(res.text)
+        if res.status_code == 200:
+            self.onSuccess.emit(msg)
+        else:
+            self.onError.emit(msg)

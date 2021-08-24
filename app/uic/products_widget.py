@@ -9,7 +9,11 @@ from app.workers import GetProductsWorker
 from app.utils import comma_separator
 from app.res.rcc import product
 from app.forms import CreateProductForm, UpdateProductForm
-from app.workers import CreateProductWorker, UpdateProductWorker
+from app.workers import CreateProductWorker, UpdateProductWorker, UpdateProductQuantityWorker
+from app.uic.uic.products_widget import Ui_Form as products_widget_Ui_Form
+from app.uic.uic.create_product_widget import Ui_Form as create_product_widget_Ui_Form
+from app.uic.uic.update_product_widget import Ui_Form as update_product_widget_Ui_Form
+
 
 
 class ProductsWidget(QWidget):
@@ -17,34 +21,36 @@ class ProductsWidget(QWidget):
     product = None
     def __init__(self, *args):
         super(ProductsWidget, self).__init__(*args)
-        loadUi('app/uic/uic/products_widget.ui', self)
-        self.productsTable.itemSelectionChanged.connect(self.show_product)
-        self.productsTable.setColumnHidden(0, True)
-        self.productsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.productsTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.ui = products_widget_Ui_Form()
+        self.ui.setupUi(self)
+
+        self.ui.productsTable.itemSelectionChanged.connect(self.show_product)
+        self.ui.productsTable.setColumnHidden(0, True)
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.get_products_worker = GetProductsWorker()
         self.get_products_worker.onSuccess.connect(self.load_products)
         self.get_products_worker.start()
-        self.newProductButton.clicked.connect(self.show_create_product_dialog)
-        self.editProductButton.clicked.connect(self.show_update_product_dialog)
-        self.addProductStockButton.clicked.connect(self.show_add_product_stock_dialog)
+        self.ui.newProductButton.clicked.connect(self.show_create_product_dialog)
+        self.ui.editProductButton.clicked.connect(self.show_update_product_dialog)
+        self.ui.addProductStockButton.clicked.connect(self.show_add_product_stock_dialog)
         self.create_product_widget = CreateProductWidget(parent=self)
 
     def load_products(self, data_list):
         self.products = data_list
-        self.productsTable.setSortingEnabled(False)
-        self.productsTable.setRowCount(len(data_list))
+        self.ui.productsTable.setSortingEnabled(False)
+        self.ui.productsTable.setRowCount(len(data_list))
         row = 0
         for data in data_list:
             ID = data.get("id")
             name = data.get("name")
             quantity = data.get("quantity")
             units = data.get("units")
-            self.productsTable.setItem(row, 0, QTableWidgetItem(str(ID)))
-            self.productsTable.setItem(row, 1, QTableWidgetItem(name))
-            self.productsTable.setItem(row, 2, QTableWidgetItem(f"{comma_separator(quantity)} ({units})"))
+            self.ui.productsTable.setItem(row, 0, QTableWidgetItem(str(ID)))
+            self.ui.productsTable.setItem(row, 1, QTableWidgetItem(name))
+            self.ui.productsTable.setItem(row, 2, QTableWidgetItem(f"{comma_separator(quantity)} ({units})"))
             row += 1
-        self.productsTable.setSortingEnabled(True)
+        self.ui.productsTable.setSortingEnabled(True)
 
     def get_product(self, item_id):
         def filter_item(item):
@@ -53,22 +59,24 @@ class ProductsWidget(QWidget):
             return item    
 
     def show_product(self):
-        currentRow = self.productsTable.currentRow()
+        currentRow = self.ui.productsTable.currentRow()
         currentCol = 0
-        ID = int(self.productsTable.item(currentRow, currentCol).text())
+        ID = int(self.ui.productsTable.item(currentRow, currentCol).text())
         product = self.get_product(ID)
         self.product = product
         self.update_product_labels(product)
 
     def update_product_labels(self, product):
-        self.productIdLabel.setText(str(product.get("id")))
-        self.productNameLabel.setText(product.get("name"))
-        self.productBrandLabel.setText(product.get("brand"))
-        self.productBarcodeLabel.setText(product.get("barcode"))
-        self.productDescriptionLabel.setText(product.get("description"))
-        self.productQuantityLabel.setText(f'{product.get("quantity")} ({product.get("units")})')
-        self.editProductButton.setText("Edit")
-        self.addProductStockButton.setText("Add Stock")
+        self.ui.productIdLabel.setText(str(product.get("id")))
+        self.ui.productNameLabel.setText(product.get("name"))
+        self.ui.productBrandLabel.setText(product.get("brand"))
+        self.ui.productBarcodeLabel.setText(product.get("barcode"))
+        self.ui.buyingPriceLabel.setText(f"{comma_separator(product.get('buying_price'))} (Buying)")
+        self.ui.sellingPriceLabel.setText(f'{comma_separator(product.get("selling_price"))} (Selling)')
+        self.ui.productDescriptionLabel.setText(product.get("description"))
+        self.ui.productQuantityLabel.setText(f'{product.get("quantity")} ({product.get("units")})')
+        self.ui.editProductButton.setText("Edit")
+        self.ui.addProductStockButton.setText("Add Stock")
 
     def show_create_product_dialog(self):
         self.create_product_widget.show()
@@ -81,7 +89,14 @@ class ProductsWidget(QWidget):
         i, ok = QInputDialog.getInt(self, "Add Stock",
                 f"Quantity ({self.product.get('units')})")
         if ok:
-            self.integerLabel.setText("%d%%" % i)
+            data = {"quantity": i}
+            self.worker = UpdateProductQuantityWorker(self.product, data)
+            self.worker.onSuccess.connect(self.onUpdateProductQuantitySuccess)
+            self.worker.start()
+
+    def onUpdateProductQuantitySuccess(self, products):
+        self.load_products(products)
+        self.show_product()
 
 
 
@@ -90,10 +105,11 @@ class CreateProductWidget(QDialog):
     def __init__(self, parent):
         super(CreateProductWidget, self).__init__()
         self.parent = parent
-        loadUi('app/uic/uic/create_product_widget.ui', self)
-        self.create_product_form = CreateProductForm(self.scrollLayout)
+        self.ui = create_product_widget_Ui_Form()
+        self.ui.setupUi(self)
+        self.create_product_form = CreateProductForm(self.ui.scrollLayout)
         self.form_widgets = self.create_product_form.layout_field_widgets()
-        self.submitButton.clicked.connect(self.submit)
+        self.ui.submitButton.clicked.connect(self.submit)
 
     def submit(self):
         # get data
@@ -109,7 +125,7 @@ class CreateProductWidget(QDialog):
         self.create_product_form.form_data = data
         if self.create_product_form.validate_form_data():
             self.create_product_worker = CreateProductWorker(data)
-            self.create_product_worker.onStarted.connect(lambda: self.progressLabel.setText("Loading ..."))
+            self.create_product_worker.onStarted.connect(lambda: self.ui.progressLabel.setText("Loading ..."))
             self.create_product_worker.onSuccess.connect(self.load_products)
             self.create_product_worker.onError.connect(self.onCreateProductError)
             self.create_product_worker.start()
@@ -119,14 +135,14 @@ class CreateProductWidget(QDialog):
         errors = message.get("message")
         self.create_product_form.errors = errors
         self.create_product_form.show_errors()
-        self.progressLabel.setText("")
+        self.ui.progressLabel.setText("")
 
     def setProgressLabel(self, text):
-        self.progressLabel.setText(text)
+        self.ui.progressLabel.setText(text)
 
     def load_products(self, products):
         self.parent.load_products(products)
-        self.progressLabel.setText("")
+        self.ui.progressLabel.setText("")
         self.create_product_form.clear()
 
 
@@ -134,14 +150,15 @@ class UpdateProductWidget(QDialog):
     
     def __init__(self, parent, product):
         super(UpdateProductWidget, self).__init__()
-        loadUi('app/uic/uic/update_product_widget.ui', self)
+        self.ui = update_product_widget_Ui_Form()
+        self.ui.setupUi(self)
         self.parent = parent
         self.product = product
-        self.update_product_form = UpdateProductForm(box_layout=self.scrollLayout)
+        self.update_product_form = UpdateProductForm(box_layout=self.ui.scrollLayout)
         self.update_product_form.layout_field_widgets()
         self.update_product_form.form_data = self.product
         self.update_product_form.set_widget_values()
-        self.submitButton.clicked.connect(self.submit)
+        self.ui.submitButton.clicked.connect(self.submit)
 
     def submit(self):
         # get data
@@ -164,14 +181,14 @@ class UpdateProductWidget(QDialog):
         self.update_product_form.show_errors()
 
     def onStarted(self):
-        self.progressLabel.setText("Please wait...")
+        self.ui.progressLabel.setText("Please wait...")
 
     def onSuccess(self, products):
         self.parent.load_products(products)
-        self.progressLabel.setText("")
+        self.ui.progressLabel.setText("")
 
     def onUpdateProductError(self, message):
         errors = message.get("message")
         self.update_product_form.errors = errors
         self.update_product_form.show_errors()
-        self.progressLabel.setText("")
+        self.ui.progressLabel.setText("")

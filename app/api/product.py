@@ -22,6 +22,11 @@ def update_product(product_id, data):
     res = requests.put(url, json=data)
     return res
 
+def update_product_quantity(product_id, data):
+    url = attach_token(f"{url_start}/products/{product_id}/quantity")
+    res = requests.put(url, json=data)
+    return res
+
 def delete_product(product_id):
     url = attach_token(f"{url_start}/products/{product_id}")
     res = requests.delete(url)

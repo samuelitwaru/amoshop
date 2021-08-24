@@ -5,30 +5,34 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QLabel, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5.uic import loadUi
 from app import app
+from app.utils import render_list
 from app.forms.user import UpdateUserPasswordForm, CreateUserForm
-from app.workers import CreateUserWorker, GetUsersWorker, DeleteUserWorker
-
+from app.workers import CreateUserWorker, GetUsersWorker, DeleteUserWorker, UpdateUserWorker
+from app.uic.uic.users_widget import Ui_Form
 from app.res.rcc import user
+
 
 class UsersWidget(QWidget):
     users = []
     def __init__(self, *args):
         super(UsersWidget, self).__init__(*args)
-        loadUi('app/uic/uic/users_widget.ui', self) 
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
 
-        self.usersTable.itemSelectionChanged.connect(self.show_user)
-        self.newUserButton.clicked.connect(self.show_new_user)
+        self.ui.usersTable.itemSelectionChanged.connect(self.show_user)
+        self.ui.newUserButton.clicked.connect(self.show_new_user)
 
-        self.usersTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.usersTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.usersTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.usersTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.ui.usersTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.ui.usersTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.usersTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.ui.usersTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
 
-        self.create_user_form = CreateUserForm(self.createUserScroll)
+        self.create_user_form = CreateUserForm(self.ui.createUserScroll)
         self.create_user_form.layout_field_widgets()
-        self.createUserButton.clicked.connect(self.create_user)
+        self.ui.createUserButton.clicked.connect(self.create_user)
         # self.updateUserButton.clicked.connect(self.update_user)
-        self.deleteUserButton.clicked.connect(self.delete_user)
+        self.ui.deleteUserButton.clicked.connect(self.delete_user)
+        self.ui.toggleUserStateButton.clicked.connect(self.toggle_user_state)
         self.get_users_worker = GetUsersWorker()
         self.get_users_worker.onSuccess.connect(self.load_users_table)
         self.get_users_worker.start()
@@ -60,9 +64,9 @@ class UsersWidget(QWidget):
         self.create_user_form.show_errors()
 
     def delete_user(self):
-        currentRow = self.usersTable.currentRow()
+        currentRow = self.ui.usersTable.currentRow()
         currentCol = 0
-        ID = int(self.usersTable.item(currentRow, currentCol).text())
+        ID = int(self.ui.usersTable.item(currentRow, currentCol).text())
         user = self.get_user(ID)
         profile = user.get("profile")
         msgBox = QMessageBox(QMessageBox.Warning, "Delete User",
@@ -74,20 +78,44 @@ class UsersWidget(QWidget):
             self.delete_user_worker.onSuccess.connect(self.load_users_table)
             self.delete_user_worker.start()
 
+    def toggle_user_state(self):
+        currentRow = self.ui.usersTable.currentRow()
+        currentCol = 0
+        ID = int(self.ui.usersTable.item(currentRow, currentCol).text())
+        user = self.get_user(ID)
+        profile = user.get("profile")
+        is_active = user.get("is_active")
+        if is_active: 
+            action = "Deactivate"
+        else:
+            action = "Activate"
+        msgBox = QMessageBox(QMessageBox.Warning, f"{action} User",
+                f'Are you sure you want to {action} the user "{profile.get("name")}"', QMessageBox.NoButton, self)
+        msgBox.addButton(f"Yes, {action}", QMessageBox.AcceptRole)
+        msgBox.addButton("Cancel", QMessageBox.RejectRole)
+        if msgBox.exec_() == QMessageBox.AcceptRole:
+            data = {"is_active": not user.get("is_active")}
+            self.update_user_worker = UpdateUserWorker(ID, data)
+            self.update_user_worker.onSuccess.connect(self.onUpdateUserSuccess)
+            self.update_user_worker.start()
+
     def onStarted(self):
-        self.createUserMessageLabel.setText("Please wait ...")
+        self.ui.createUserMessageLabel.setText("Please wait ...")
 
     def onSuccess(self, users):
-        self.createUserMessageLabel.setText("")
+        self.ui.createUserMessageLabel.setText("")
         self.load_users_table(users)
         self.create_user_form.clear()
 
+    def onUpdateUserSuccess(self, users):
+        self.load_users_table(users)
+        self.show_user()
 
     def onError(self, error):
         errors = error.get("message")
         self.create_user_form.errors = errors
         self.create_user_form.show_errors()
-        self.createUserMessageLabel.setText("") 
+        self.ui.createUserMessageLabel.setText("") 
 
     def update_user(self):
         data = {
@@ -98,8 +126,8 @@ class UsersWidget(QWidget):
 
     def load_users_table(self, users):
         self.users = users
-        self.usersTable.setSortingEnabled(False)
-        self.usersTable.setRowCount(len(users))
+        self.ui.usersTable.setSortingEnabled(False)
+        self.ui.usersTable.setRowCount(len(users))
         row = 0
         for user in users:
             profile = user.get("profile")
@@ -107,29 +135,35 @@ class UsersWidget(QWidget):
             email = profile.get("email")
             telephone = profile.get("telephone")
             ID = user.get("id")
-            self.usersTable.setItem(row, 0, QTableWidgetItem(str(ID)))
-            self.usersTable.setItem(row, 1, QTableWidgetItem(name))
-            self.usersTable.setItem(row, 2, QTableWidgetItem(email))
-            self.usersTable.setItem(row, 3, QTableWidgetItem(telephone))
+            self.ui.usersTable.setItem(row, 0, QTableWidgetItem(str(ID)))
+            self.ui.usersTable.setItem(row, 1, QTableWidgetItem(name))
+            self.ui.usersTable.setItem(row, 2, QTableWidgetItem(email))
+            self.ui.usersTable.setItem(row, 3, QTableWidgetItem(telephone))
             row += 1
 
-        self.usersTable.setSortingEnabled(True)
+        self.ui.usersTable.setSortingEnabled(True)
 
     def show_user(self):
-        currentRow = self.usersTable.currentRow()
+        currentRow = self.ui.usersTable.currentRow()
         currentCol = 0
-        ID = int(self.usersTable.item(currentRow, currentCol).text())
+        ID = int(self.ui.usersTable.item(currentRow, currentCol).text())
         user = self.get_user(ID)
         self.update_user_labels(user)
-        self.stackedWidget.setCurrentIndex(1)
+        self.ui.stackedWidget.setCurrentIndex(1)
 
     def show_new_user(self):
-        self.stackedWidget.setCurrentIndex(0)
-
+        self.ui.stackedWidget.setCurrentIndex(0)
 
     def update_user_labels(self, user):
         profile = user.get("profile")
-        self.userIdLabel.setText(str(user.get("id")))
-        self.userNameLabel.setText(profile.get("name"))
-        self.userEmailLabel.setText(profile.get("email"))
-        self.userTelephoneLabel.setText(profile.get("telephone"))
+        is_active = user.get("is_active")
+        self.ui.userIdLabel.setText(str(user.get("id")))
+        self.ui.userNameLabel.setText(profile.get("name"))
+        self.ui.userEmailLabel.setText(profile.get("email"))
+        self.ui.userTelephoneLabel.setText(profile.get("telephone"))
+        self.ui.userRolesLabel.setText(render_list(user.get("roles")))
+        if is_active:
+            self.ui.toggleUserStateButton.setText("Deactivate")
+        else:
+            self.ui.toggleUserStateButton.setText("Activate")
+

@@ -4,15 +4,18 @@ from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtGui import *
 from app.utils import comma_separator
 from app import app
-from app.workers import CreateUserSessionWorker, GetUserSessionWorker, EndSessionWorker, SearchProductWorker, CheckoutWorker
-from app.models import session, Product, product_schema
+from app.workers import CreateUserSessionWorker, GetUserSessionWorker, EndSessionWorker, SearchProductWorker, CheckoutWorker, GetProductsWorker
+from app.models import session, Product, product_schema, load_products
+from app.uic.uic.selling_widget import Ui_Form
+
 
 class SellingWidget(QWidget):
     
     def __init__(self, *args):
         super(SellingWidget, self).__init__(*args)
-        loadUi('app/uic/uic/selling_widget2.ui', self)
-        
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
         # init state data
         self.sales = {
             "amount": 0,
@@ -22,41 +25,42 @@ class SellingWidget(QWidget):
         self.session = None
         self.products = None
 
-        # setup ui
-        self.searchLineEdit.textChanged.connect(self.search_product_2)
-        self.clearButton.clicked.connect(self.clear_cart)
-        self.checkoutButton.clicked.connect(self.checkout)
-        # setup productsTable
-        self.productsTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.productsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.productsTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.productsTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
-        self.productsTable.setColumnHidden(0, True)
-        # setup cartTable
-        self.cartTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.cartTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.cartTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.cartTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
-        self.cartTable.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
-        self.cartTable.horizontalHeader().setSectionResizeMode(5, QHeaderView.Stretch)
-        self.cartTable.setColumnHidden(0, True)
-        # setup amountLineEdit
-        self.amountLineEdit.setValidator(QIntValidator(self.amountLineEdit))
-        self.amountLineEdit.textChanged.connect(self.setBalance)
-        self.amountLineEdit.returnPressed.connect(self.checkout)
-        # setup session
-        # self.startSessionButton.clicked.connect(self.start_user_session)
-        # self.endSessionButton.clicked.connect(self.end_session)
+        self.get_products_worker = GetProductsWorker()
+        self.get_products_worker.onSuccess.connect(load_products)
+        self.get_products_worker.start()
 
+        # setup ui
+        self.ui.searchLineEdit.textChanged.connect(self.search_product_2)
+        self.ui.clearButton.clicked.connect(self.clear_cart)
+        self.ui.checkoutButton.clicked.connect(self.checkout)
+        # setup productsTable
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.ui.productsTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.ui.productsTable.setColumnHidden(0, True)
+        # setup cartTable
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(4, QHeaderView.Stretch)
+        self.ui.cartTable.horizontalHeader().setSectionResizeMode(5, QHeaderView.Stretch)
+        self.ui.cartTable.setColumnHidden(0, True)
+        # setup amountLineEdit
+        self.ui.amountLineEdit.setValidator(QIntValidator(self.ui.amountLineEdit))
+        self.ui.amountLineEdit.textChanged.connect(self.setBalance)
+        self.ui.amountLineEdit.returnPressed.connect(self.checkout)
+        
     def search_product(self):
-        query_string = self.searchLineEdit.text()
+        query_string = self.ui.searchLineEdit.text()
         if query_string:
             self.worker = SearchProductWorker(query_string)
             self.worker.onSuccess.connect(self.onSearchResult)
             self.worker.start()
 
     def search_product_2(self):
-        query_string = self.searchLineEdit.text()
+        query_string = self.ui.searchLineEdit.text()
         products = []
         if query_string:
             query = session.query(Product).filter(Product.barcode==query_string)
@@ -69,10 +73,9 @@ class SellingWidget(QWidget):
     def onSearchResult(self, data_list):
         if len(data_list) == 1:
             self.add_to_cart_2(data_list[0])
-            self.searchLineEdit.clear()
+            self.ui.searchLineEdit.clear()
         self.products = data_list
         self.load_products_2()
-
 
     def add_to_cart(self, product):
         cart_product = self.sales.get('cart').get(product.get("id"))
@@ -116,12 +119,12 @@ class SellingWidget(QWidget):
             "paid": 0,
             "cart": dict()
         }
-        self.amountLineEdit.clear()
+        self.ui.amountLineEdit.clear()
         self.refresh_cart()
-        self.searchLineEdit.setFocus()
+        self.ui.searchLineEdit.setFocus()
 
     def refresh_cart(self):
-        self.cartTable.setRowCount(len(self.sales.get('cart')))
+        self.ui.cartTable.setRowCount(len(self.sales.get('cart')))
         row = 0
         amount = 0
         for ID, data in self.sales.get('cart').items():
@@ -134,22 +137,22 @@ class SellingWidget(QWidget):
             removeFromCartButton.setStyleSheet("margin:2px;") 
             removeFromCartButton.clicked.connect(
                 lambda: self.remove_from_cart (
-                        int(self.cartTable.item(self.cartTable.currentRow(), 0).text())
+                        int(self.ui.cartTable.item(self.ui.cartTable.currentRow(), 0).text())
                     )
                 )
-            self.cartTable.setItem(row, 0, QTableWidgetItem(str(ID)))
-            self.cartTable.setCellWidget(row, 1, removeFromCartButton)
-            self.cartTable.setItem(row, 2, QTableWidgetItem(name))
-            self.cartTable.setItem(row, 3, QTableWidgetItem(comma_separator(quantity)))
-            self.cartTable.setItem(row, 4, QTableWidgetItem(comma_separator(unit_price)))
-            self.cartTable.setItem(row, 5, QTableWidgetItem(comma_separator(total)))
+            self.ui.cartTable.setItem(row, 0, QTableWidgetItem(str(ID)))
+            self.ui.cartTable.setCellWidget(row, 1, removeFromCartButton)
+            self.ui.cartTable.setItem(row, 2, QTableWidgetItem(name))
+            self.ui.cartTable.setItem(row, 3, QTableWidgetItem(comma_separator(quantity)))
+            self.ui.cartTable.setItem(row, 4, QTableWidgetItem(comma_separator(unit_price)))
+            self.ui.cartTable.setItem(row, 5, QTableWidgetItem(comma_separator(total)))
             row += 1
         self.sales['amount'] = amount
-        self.amountLabel.setText(comma_separator(amount))
+        self.ui.amountLabel.setText(comma_separator(amount))
         self.setBalance()
 
     def refresh_cart_2(self):
-        self.cartTable.setRowCount(len(self.sales.get('cart')))
+        self.ui.cartTable.setRowCount(len(self.sales.get('cart')))
         row = 0
         amount = 0
         for ID, product in self.sales.get('cart').items():
@@ -159,22 +162,22 @@ class SellingWidget(QWidget):
             removeFromCartButton.setStyleSheet("margin:2px;") 
             removeFromCartButton.clicked.connect(
                 lambda: self.remove_from_cart_2 (
-                        int(self.cartTable.item(self.cartTable.currentRow(), 0).text())
+                        int(self.ui.cartTable.item(self.ui.cartTable.currentRow(), 0).text())
                     )
                 )
-            self.cartTable.setItem(row, 0, QTableWidgetItem(str(ID)))
-            self.cartTable.setCellWidget(row, 1, removeFromCartButton)
-            self.cartTable.setItem(row, 2, QTableWidgetItem(product.name))
-            self.cartTable.setItem(row, 3, QTableWidgetItem(comma_separator(product.quantity)))
-            self.cartTable.setItem(row, 4, QTableWidgetItem(comma_separator(product.selling_price)))
-            self.cartTable.setItem(row, 5, QTableWidgetItem(comma_separator(total)))
+            self.ui.cartTable.setItem(row, 0, QTableWidgetItem(str(ID)))
+            self.ui.cartTable.setCellWidget(row, 1, removeFromCartButton)
+            self.ui.cartTable.setItem(row, 2, QTableWidgetItem(product.name))
+            self.ui.cartTable.setItem(row, 3, QTableWidgetItem(comma_separator(product.quantity)))
+            self.ui.cartTable.setItem(row, 4, QTableWidgetItem(comma_separator(product.selling_price)))
+            self.ui.cartTable.setItem(row, 5, QTableWidgetItem(comma_separator(total)))
             row += 1
         self.sales['amount'] = amount
-        self.amountLabel.setText(comma_separator(amount))
+        self.ui.amountLabel.setText(comma_separator(amount))
         self.setBalance()
 
     def load_products(self):
-        self.productsTable.setRowCount(len(self.products))
+        self.ui.productsTable.setRowCount(len(self.products))
         row = 0
         for data in self.products:
             ID = data.get("id")
@@ -185,19 +188,19 @@ class SellingWidget(QWidget):
             addToCartButton.clicked.connect(
                 lambda: self.add_to_cart (
                         self.get_product_by_id (
-                            int(self.productsTable.item(self.productsTable.currentRow(), 0).text())
+                            int(self.ui.productsTable.item(self.ui.productsTable.currentRow(), 0).text())
                         )
                     )
                 )
-            self.productsTable.setItem(row, 0, QTableWidgetItem(str(ID)))
-            self.productsTable.setItem(row, 1, QTableWidgetItem(name))
-            self.productsTable.setItem(row, 2, QTableWidgetItem(brand))
-            self.productsTable.setCellWidget(row, 3, addToCartButton)
+            self.ui.productsTable.setItem(row, 0, QTableWidgetItem(str(ID)))
+            self.ui.productsTable.setItem(row, 1, QTableWidgetItem(name))
+            self.ui.productsTable.setItem(row, 2, QTableWidgetItem(brand))
+            self.ui.productsTable.setCellWidget(row, 3, addToCartButton)
 
             row += 1
 
     def load_products_2(self):
-        self.productsTable.setRowCount(len(self.products))
+        self.ui.productsTable.setRowCount(len(self.products))
         row = 0
         for product in self.products:
             addToCartButton = QPushButton(text="+")
@@ -205,33 +208,37 @@ class SellingWidget(QWidget):
             addToCartButton.clicked.connect(
                 lambda: self.add_to_cart_2 (
                         self.get_product_by_id_2 (
-                            int(self.productsTable.item(self.productsTable.currentRow(), 0).text())
+                            int(self.ui.productsTable.item(self.ui.productsTable.currentRow(), 0).text())
                         )
                     )
                 )
-            self.productsTable.setItem(row, 0, QTableWidgetItem(str(product.id)))
-            self.productsTable.setItem(row, 1, QTableWidgetItem(product.name))
-            self.productsTable.setItem(row, 2, QTableWidgetItem(product.brand))
-            self.productsTable.setCellWidget(row, 3, addToCartButton)
+            self.ui.productsTable.setItem(row, 0, QTableWidgetItem(str(product.id)))
+            self.ui.productsTable.setItem(row, 1, QTableWidgetItem(product.name))
+            self.ui.productsTable.setItem(row, 2, QTableWidgetItem(comma_separator(product.selling_price)))
+            self.ui.productsTable.setCellWidget(row, 3, addToCartButton)
             row += 1
             
     def checkout(self):
-        message = "Check out the following products?\n\n"
-        for ID, product in self.sales.get('cart').items():
-            message += f"{product.get('name')} ({product.get('quantity')}):         {product.get('selling_price')*product.get('quantity')}\n"
-        
-        reply = QMessageBox.question(self, "Confirm Checkout",
-                message,
-                QMessageBox.Yes | QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.sales["session"] = self.session
-            self.checkout_worker = CheckoutWorker(self.sales)
-            self.checkout_worker.onSuccess.connect(self.clear_cart)
-            self.checkout_worker.start()
-        elif reply == QMessageBox.No:
-            pass
+        if self.sales["paid"] < self.sales["amount"]:
+            reply = QMessageBox.information(self,
+                    "Invalid amount", f"Invalid amount paid. It should be atleast {comma_separator(self.sales['amount'])}") 
         else:
-            pass
+            message = "Check out the following products?\n\n"
+            for ID, product in self.sales.get('cart').items():
+                message += f"{product.get('name')} ({product.get('quantity')}):         {product.get('selling_price')*product.get('quantity')}\n"
+        
+            reply = QMessageBox.question(self, "Confirm Checkout",
+                    message,
+                    QMessageBox.Yes | QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                self.sales["session"] = self.session
+                self.checkout_worker = CheckoutWorker(self.sales)
+                self.checkout_worker.onSuccess.connect(self.clear_cart)
+                self.checkout_worker.start()
+            elif reply == QMessageBox.No:
+                pass
+            else:
+                pass
 
     def checkout_2(self):
         message = "Check out the following products?\n\n"
@@ -252,15 +259,15 @@ class SellingWidget(QWidget):
             pass
         
     def setBalance(self):
-        paid = self.amountLineEdit.text() or 0
-        self.sales["paid"] = paid
+        paid = self.ui.amountLineEdit.text() or 0
+        self.sales["paid"] = int(paid)
         balance = int(paid)-self.sales.get('amount')
-        self.balanceLabel.setText(comma_separator(balance))
+        self.ui.balanceLabel.setText(comma_separator(balance))
 
         if balance < 0:
-            self.balanceLabel.setStyleSheet("color:red;")
+            self.ui.balanceLabel.setStyleSheet("color:red;")
         else:
-            self.balanceLabel.setStyleSheet("color:green;")
+            self.ui.balanceLabel.setStyleSheet("color:green;")
 
     def get_product_by_id(self, product_id):
         def filter_product(product):

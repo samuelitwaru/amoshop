@@ -231,7 +231,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QLabel" name="userRolesLabel">
+               <property name="text">
+                <string>ROLES</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="toggleUserStateButton">
                <property name="text">
                 <string>Deactivate</string>
                </property>
@@ -295,8 +302,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../res/rcc/user.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

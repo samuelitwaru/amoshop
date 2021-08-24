@@ -61,6 +61,26 @@ class UpdateProductWorker(QThread):
             self.onError.emit(msg)
 
 
+class UpdateProductQuantityWorker(QThread):
+    onStarted = pyqtSignal()
+    onSuccess = pyqtSignal(list)
+    onError = pyqtSignal(dict)
+
+    def __init__(self, product, data):
+        super().__init__()
+        self.product = product
+        self.data = data
+
+    def run(self):
+        self.onStarted.emit()
+        res = api.update_product_quantity(self.product.get("id"), self.data)
+        msg = json.loads(res.text)
+        if res.status_code == 200:
+            self.onSuccess.emit(msg)
+        else:
+            self.onError.emit(msg)
+
+
 class GetProductsWorker(QThread):
     onStarted = pyqtSignal()
     onSuccess = pyqtSignal(list)
@@ -70,13 +90,16 @@ class GetProductsWorker(QThread):
         super().__init__()
 
     def run(self):
-        res = api.get_products()
-        msg = json.loads(res.text)
-        if res.status_code == 200:
-            self.onSuccess.emit(msg)
-        else:
-            self.onError.emit(msg)
-
+        try:
+            res = api.get_products()
+            msg = json.loads(res.text)
+            if res.status_code == 200:
+                self.onSuccess.emit(msg)
+            else:
+                self.onError.emit(msg)
+        except Exception as e:
+            print(str(e))
+            
 
 class DeleteProductWorker(QThread):
     onStarted = pyqtSignal()

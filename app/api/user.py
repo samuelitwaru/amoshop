@@ -8,6 +8,7 @@ def login(data):
     res = requests.post(url, json=data)
     return res
 
+
 def create_user(data):
     url = attach_token(f"{url_start}/users")
     res = requests.post(url, json=data)
@@ -17,6 +18,12 @@ def create_user(data):
 def get_users():
     url = attach_token(f"{url_start}/users")
     res = requests.get(url)
+    return res
+
+
+def update_user(user_id, data):
+    url = attach_token(f"{url_start}/users/{user_id}")
+    res = requests.put(url, json=data)
     return res
 
 

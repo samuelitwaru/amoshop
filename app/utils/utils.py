@@ -1,4 +1,7 @@
 from datetime import datetime
+from PyQt5.QtCore import QFile
+from PyQt5.uic import loadUiType
+
 
 
 def combine_styles(style_list):
@@ -30,3 +33,12 @@ def render_list(string_list):
     for string in string_list:
         output += f"<li>{string}</li>"
     return output+"</ul"
+
+
+def loadUiClass(path):
+    stream = QFile(path)
+    stream.open(QFile.ReadOnly)
+    try:
+        return loadUiType(stream)[0]
+    finally:
+        stream.close()

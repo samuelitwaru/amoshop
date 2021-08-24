@@ -6,22 +6,24 @@ from config import Config
 
 app = QApplication(sys.argv)
 from app.uic.login_page import LoginPage
+from app.uic.register_admin import RegisterAdmin
 
 from app.workers import GetProductsWorker
 
 
-from app.models import create_db, load_products
+from app.models import create_db
+
 
 session = create_db()
-get_products_worker = GetProductsWorker()
-get_products_worker.onSuccess.connect(load_products)
-get_products_worker.start()
-
+# get_products_worker = GetProductsWorker()
+# get_products_worker.onSuccess.connect(load_products)
+# get_products_worker.start()
 
 app.user = None
 
 # pages
 login_page = LoginPage()
+
 
 window = QStackedWidget()
 window.addWidget(login_page)
