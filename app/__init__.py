@@ -2,22 +2,20 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QStackedWidget
 from PyQt5.uic import loadUi
 from config import Config
-
+import requests
 
 app = QApplication(sys.argv)
 from app.uic.login_page import LoginPage
 from app.uic.register_admin import RegisterAdmin
 
-from app.workers import GetProductsWorker
+from app.workers import GetProductsWorker, SendRequestWorker
 
 
 from app.models import create_db
 
 
 session = create_db()
-# get_products_worker = GetProductsWorker()
-# get_products_worker.onSuccess.connect(load_products)
-# get_products_worker.start()
+
 
 app.user = None
 

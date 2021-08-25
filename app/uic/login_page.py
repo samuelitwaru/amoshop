@@ -1,16 +1,17 @@
 import sys
 import time
-
+import requests
 from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMessageBox
 from PyQt5.uic import loadUi, loadUiType
 from app.views.main_page import MainPage
-from app.workers import LoginWorker, GetUsersWorker, CreateUserWorker
+from app.workers import SendRequestWorker, LoginWorker, GetUsersWorker, CreateUserWorker
 from app import app
 from app.forms import LoginForm, RegisterAsAdminForm
 from app.uic.uic import login_page
 from app.utils import loadUiClass
 from app.uic.uic.login_page import Ui_Form
 from app.uic.uic.register_admin import Ui_Form as register_admin_Ui_Form
+from app.api import urls
 
 
 
@@ -33,11 +34,11 @@ class LoginPage(QWidget):
         }
         self.login_form.form_data = data
         if self.login_form.validate_form_data():
-            self.worker = LoginWorker(data)
-            self.worker.onStarted.connect(self.onLoginStarted)
-            self.worker.onSuccess.connect(self.onLoginSuccess)
-            self.worker.onError.connect(self.onLoginError)
-            self.worker.start()
+            self.login_worker = SendRequestWorker(urls.login, requests.post, json=data)
+            self.login_worker.onStarted.connect(self.onLoginStarted)
+            self.login_worker.onSuccessDict.connect(self.onLoginSuccess)
+            self.login_worker.onError.connect(self.onLoginError)
+            self.login_worker.start()
         self.login_form.show_errors()
 
     def onLoginStarted(self):

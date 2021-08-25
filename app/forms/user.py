@@ -121,7 +121,6 @@ class RegisterAsAdminForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "Samuel Itwaru"
         },
         "email": {
             "label": "Email",
@@ -129,7 +128,6 @@ class RegisterAsAdminForm(Form):
             "validators": [IsRequired(), Email()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "samuelitwaru@gmail.com"
         },
         "telephone": {
             "label": "Telephone",
@@ -137,7 +135,6 @@ class RegisterAsAdminForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QIntegerEdit,
-            "default": "077384823"
         },
         "username": {
             "label": "Username",
@@ -145,7 +142,6 @@ class RegisterAsAdminForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": w.QLineEdit,
-            "default": "samit"
         },
         "password": {
             "label": "Password",
@@ -153,7 +149,6 @@ class RegisterAsAdminForm(Form):
             "validators": [IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit,
-            "default": "123"
         },
         "confirm_password": {
             "label": "Confirm Password",
@@ -161,7 +156,6 @@ class RegisterAsAdminForm(Form):
             "validators": [EqualTo("password"), IsRequired()],
             "data_processor": None,
             "widget": QPasswordEdit,
-            "default": "123"
         },
         "roles": {
             "label": "Roles",

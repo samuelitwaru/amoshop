@@ -1,6 +1,7 @@
 import json
 from PyQt5.QtCore import pyqtSignal, QThread
 from app import api
+from app.utils import catch_connection_exception
 
 
 class UpdateUserPasswordWorker(QThread):
@@ -69,6 +70,7 @@ class GetUsersWorker(QThread):
     def __init__(self):
         super().__init__()
 
+    @catch_connection_exception
     def run(self):
         self.onStarted.emit()
         res = api.get_users()

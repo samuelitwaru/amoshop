@@ -157,11 +157,19 @@ class UsersWidget(QWidget):
     def update_user_labels(self, user):
         profile = user.get("profile")
         is_active = user.get("is_active")
+        roles = user.get("roles")
         self.ui.userIdLabel.setText(str(user.get("id")))
         self.ui.userNameLabel.setText(profile.get("name"))
         self.ui.userEmailLabel.setText(profile.get("email"))
         self.ui.userTelephoneLabel.setText(profile.get("telephone"))
-        self.ui.userRolesLabel.setText(render_list(user.get("roles")))
+        self.ui.userRolesLabel.setText(render_list(roles))
+        if "admin" in roles:
+            hidden = True
+        else:
+            hidden = False
+        self.ui.toggleUserStateButton.setHidden(hidden)
+        self.ui.deleteUserButton.setHidden(hidden)
+
         if is_active:
             self.ui.toggleUserStateButton.setText("Deactivate")
         else:
