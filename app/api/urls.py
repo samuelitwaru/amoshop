@@ -1,20 +1,21 @@
 from . import url_start
 
 
-login = f"{url_start}/users/auth"
+user_list = url_start + "/users"
+user = url_start + "/users/{id}"
+user_auth = url_start + "/users/auth"
+user_update = url_start + "/users/{id}/update"
 
-user_list = f"{url_start}/users"
-user = f"{url_start}/users/<int:id>"
-user_auth = f"{url_start}/users/auth"
-user_update = f"{url_start}/users/<int:id>/update"
+stock_list = url_start + "/stock"
+stock = url_start + "/stock/{id}"
 
-stock_list = f"{url_start}/stock"
-stock = f"{url_start}/stock/<int:id>"
+sale_list = url_start + "/sales"
+sale = url_start + "/sales/{id}"
+sale_checkout = url_start + "/sales/checkout"
 
-sale_list = f"{url_start}/sales"
-sale = f"{url_start}/sales/<int:id>"
-sale_checkout = f"{url_start}/sales/checkout"
+product_list = url_start + "/products"
+product = url_start + "/products/{id}"
+product_quantity = url_start + "/products/{id}/quantity"
 
-product_list = f"{url_start}/products"
-product = f"{url_start}/products/<int:id>"
-product_quantity = f"{url_start}/products/<int:id>/quantity"
+sale_group_list = url_start + "/sale-groups"
+sale_group = url_start + "/sale-groups/{id}"

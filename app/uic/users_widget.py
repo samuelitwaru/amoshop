@@ -7,9 +7,11 @@ from PyQt5.uic import loadUi
 from app import app
 from app.utils import render_list
 from app.forms.user import UpdateUserPasswordForm, CreateUserForm
-from app.workers import CreateUserWorker, GetUsersWorker, DeleteUserWorker, UpdateUserWorker
+from app.workers import SendRequestWorker
 from app.uic.uic.users_widget import Ui_Form
 from app.res.rcc import user
+from app.api import urls
+import requests
 
 
 class UsersWidget(QWidget):
@@ -33,8 +35,9 @@ class UsersWidget(QWidget):
         # self.updateUserButton.clicked.connect(self.update_user)
         self.ui.deleteUserButton.clicked.connect(self.delete_user)
         self.ui.toggleUserStateButton.clicked.connect(self.toggle_user_state)
-        self.get_users_worker = GetUsersWorker()
-        self.get_users_worker.onSuccess.connect(self.load_users_table)
+        
+        self.get_users_worker = SendRequestWorker(urls.user_list, requests.get)
+        self.get_users_worker.onSuccessList.connect(self.load_users_table)
         self.get_users_worker.start()
 
     def get_user(self, item_id):
@@ -55,9 +58,9 @@ class UsersWidget(QWidget):
         }
         self.create_user_form.form_data = data
         if self.create_user_form.validate_form_data():
-            self.create_user_worker = CreateUserWorker(data)
+            self.create_user_worker = SendRequestWorker(urls.user_list, requests.post, json=data)
             self.create_user_worker.onStarted.connect(self.onStarted)
-            self.create_user_worker.onSuccess.connect(self.onSuccess)
+            self.create_user_worker.onSuccessList.connect(self.onSuccess)
             self.create_user_worker.onError.connect(self.onError)
             self.create_user_worker.start()
 
@@ -74,8 +77,8 @@ class UsersWidget(QWidget):
         msgBox.addButton("Yes, delete", QMessageBox.AcceptRole)
         msgBox.addButton("Cancel", QMessageBox.RejectRole)
         if msgBox.exec_() == QMessageBox.AcceptRole:
-            self.delete_user_worker = DeleteUserWorker(ID)
-            self.delete_user_worker.onSuccess.connect(self.load_users_table)
+            self.delete_user_worker = SendRequestWorker(urls.user.format_map({"id":ID}), requests.delete)
+            self.delete_user_worker.onSuccessList.connect(self.load_users_table)
             self.delete_user_worker.start()
 
     def toggle_user_state(self):
@@ -95,8 +98,8 @@ class UsersWidget(QWidget):
         msgBox.addButton("Cancel", QMessageBox.RejectRole)
         if msgBox.exec_() == QMessageBox.AcceptRole:
             data = {"is_active": not user.get("is_active")}
-            self.update_user_worker = UpdateUserWorker(ID, data)
-            self.update_user_worker.onSuccess.connect(self.onUpdateUserSuccess)
+            self.update_user_worker = SendRequestWorker(urls.user.format_map({"id":ID}), requests.put, json=data)
+            self.update_user_worker.onSuccessList.connect(self.onUpdateUserSuccess)
             self.update_user_worker.start()
 
     def onStarted(self):

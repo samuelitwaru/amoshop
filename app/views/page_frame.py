@@ -1,7 +1,4 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QStackedWidget
-from app.views.sales_page import SalesPage
-from app.views.stock_page import StockPage
-from app.views.products_page import ProductsPage
 from app.uic import ProductsWidget
 from app.uic import SalesWidget
 from app.uic import SellingWidget

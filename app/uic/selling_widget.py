@@ -4,9 +4,12 @@ from PyQt5.QtCore import pyqtSignal, QThread
 from PyQt5.QtGui import *
 from app.utils import comma_separator
 from app import app
-from app.workers import CreateUserSessionWorker, GetUserSessionWorker, EndSessionWorker, SearchProductWorker, CheckoutWorker, GetProductsWorker
+# from app.workers import SearchProductWorker, CheckoutWorker, GetProductsWorker
 from app.models import session, Product, product_schema, load_products
 from app.uic.uic.selling_widget import Ui_Form
+from app.workers import SendRequestWorker
+from app.api import urls
+import requests
 
 
 class SellingWidget(QWidget):
@@ -25,8 +28,8 @@ class SellingWidget(QWidget):
         self.session = None
         self.products = None
 
-        self.get_products_worker = GetProductsWorker()
-        self.get_products_worker.onSuccess.connect(load_products)
+        self.get_products_worker = SendRequestWorker(urls.product_list, requests.get)
+        self.get_products_worker.onSuccessList.connect(load_products)
         self.get_products_worker.start()
 
         # setup ui
@@ -232,8 +235,8 @@ class SellingWidget(QWidget):
                     QMessageBox.Yes | QMessageBox.No)
             if reply == QMessageBox.Yes:
                 self.sales["session"] = self.session
-                self.checkout_worker = CheckoutWorker(self.sales)
-                self.checkout_worker.onSuccess.connect(self.clear_cart)
+                self.checkout_worker = SendRequestWorker(urls.sale_checkout, requests.post, json=self.sales)
+                self.checkout_worker.onSuccessList.connect(self.clear_cart)
                 self.checkout_worker.start()
             elif reply == QMessageBox.No:
                 pass
@@ -250,8 +253,8 @@ class SellingWidget(QWidget):
                 QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.sales["session"] = self.session
-            self.checkout_worker = CheckoutWorker(self.sales)
-            self.checkout_worker.onSuccess.connect(self.clear_cart)
+            self.checkout_worker = SendRequestWorker(urls.sale_checkout, requests.post, json=self.sales)
+            self.checkout_worker.onSuccessList.connect(self.clear_cart)
             self.checkout_worker.start()
         elif reply == QMessageBox.No:
             pass

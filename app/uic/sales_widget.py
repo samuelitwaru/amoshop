@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSignal, QThread
-from app.workers import GetSaleGroupsWorker
+from app.workers import SendRequestWorker
 from app.utils import comma_separator, format_from_iso_date
 from app.uic.uic.sales_widget import Ui_Form
+from app.api import urls
+import requests
 
 
 class SalesWidget(QWidget):
@@ -26,9 +28,8 @@ class SalesWidget(QWidget):
         self.ui.salesTable.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.ui.salesTable.setSelectionBehavior(QTableWidget.SelectRows)
 
-
-        self.get_sale_groups_worker = GetSaleGroupsWorker()
-        self.get_sale_groups_worker.onSuccess.connect(self.load_sale_groups)
+        self.get_sale_groups_worker = SendRequestWorker(urls.sale_group_list, requests.get)
+        self.get_sale_groups_worker.onSuccessList.connect(self.load_sale_groups)
         self.get_sale_groups_worker.start()
 
     def get_sale_group(self, sale_group_id):

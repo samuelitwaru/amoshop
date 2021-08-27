@@ -54,6 +54,7 @@ class Ui_Form(object):
         self.loginButton.setObjectName("loginButton")
         self.verticalLayout.addWidget(self.loginButton)
         self.waitLabel = QtWidgets.QLabel(self.widget)
+        self.waitLabel.setStyleSheet("color:green;")
         self.waitLabel.setText("")
         self.waitLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.waitLabel.setObjectName("waitLabel")

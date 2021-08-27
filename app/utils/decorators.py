@@ -1,6 +1,8 @@
 import functools
 import requests
 import json
+from PyQt5.QtWidgets import QMessageBox
+
 
 def catch_connection_exception(func):
 

@@ -5,15 +5,15 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QDialog, QInputDialog, QLabel, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5.uic import loadUi
 from app import app
-from app.workers import GetProductsWorker
+from app.workers import SendRequestWorker
 from app.utils import comma_separator
 from app.res.rcc import product
 from app.forms import CreateProductForm, UpdateProductForm
-from app.workers import CreateProductWorker, UpdateProductWorker, UpdateProductQuantityWorker
 from app.uic.uic.products_widget import Ui_Form as products_widget_Ui_Form
 from app.uic.uic.create_product_widget import Ui_Form as create_product_widget_Ui_Form
 from app.uic.uic.update_product_widget import Ui_Form as update_product_widget_Ui_Form
-
+import requests
+from app.api import urls
 
 
 class ProductsWidget(QWidget):
@@ -28,9 +28,11 @@ class ProductsWidget(QWidget):
         self.ui.productsTable.setColumnHidden(0, True)
         self.ui.productsTable.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.ui.productsTable.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
-        self.get_products_worker = GetProductsWorker()
-        self.get_products_worker.onSuccess.connect(self.load_products)
+        
+        self.get_products_worker = SendRequestWorker(urls.product_list, requests.get)
+        self.get_products_worker.onSuccessList.connect(self.load_products)
         self.get_products_worker.start()
+
         self.ui.newProductButton.clicked.connect(self.show_create_product_dialog)
         self.ui.editProductButton.clicked.connect(self.show_update_product_dialog)
         self.ui.addProductStockButton.clicked.connect(self.show_add_product_stock_dialog)
@@ -82,22 +84,23 @@ class ProductsWidget(QWidget):
         self.create_product_widget.show()
 
     def show_update_product_dialog(self):
-        self.update_product_widget = UpdateProductWidget(parent=self, product=self.product)
-        self.update_product_widget.show()
+        if self.product:
+            self.update_product_widget = UpdateProductWidget(parent=self, product=self.product)
+            self.update_product_widget.show()
 
     def show_add_product_stock_dialog(self):
-        i, ok = QInputDialog.getInt(self, "Add Stock",
-                f"Quantity ({self.product.get('units')})")
-        if ok:
-            data = {"quantity": i}
-            self.worker = UpdateProductQuantityWorker(self.product, data)
-            self.worker.onSuccess.connect(self.onUpdateProductQuantitySuccess)
-            self.worker.start()
+        if self.product:
+            i, ok = QInputDialog.getInt(self, "Add Stock",
+                    f"Quantity ({self.product.get('units')})")
+            if ok:
+                data = {"quantity": i}
+                self.update_product_quantity_worker = SendRequestWorker(urls.product_quantity.format_map({"id":self.product.get("id")}), requests.put, json=data)
+                self.update_product_quantity_worker.onSuccessList.connect(self.onUpdateProductQuantitySuccess)
+                self.update_product_quantity_worker.start()
 
     def onUpdateProductQuantitySuccess(self, products):
         self.load_products(products)
         self.show_product()
-
 
 
 class CreateProductWidget(QDialog):
@@ -124,9 +127,9 @@ class CreateProductWidget(QDialog):
         }
         self.create_product_form.form_data = data
         if self.create_product_form.validate_form_data():
-            self.create_product_worker = CreateProductWorker(data)
+            self.create_product_worker = SendRequestWorker(urls.product_list, requests.post, json=data)
             self.create_product_worker.onStarted.connect(lambda: self.ui.progressLabel.setText("Loading ..."))
-            self.create_product_worker.onSuccess.connect(self.load_products)
+            self.create_product_worker.onSuccessList.connect(self.load_products)
             self.create_product_worker.onError.connect(self.onCreateProductError)
             self.create_product_worker.start()
         self.create_product_form.show_errors()
@@ -173,9 +176,9 @@ class UpdateProductWidget(QDialog):
         }
         self.update_product_form.form_data = data
         if self.update_product_form.validate_form_data():
-            self.worker = UpdateProductWorker(self.product, data)
+            self.worker = SendRequestWorker(urls.product.format_map({"id": self.product.get("id")}), requests.put, json=data)
             self.worker.onStarted.connect(self.onStarted)
-            self.worker.onSuccess.connect(self.onSuccess)
+            self.worker.onSuccessList.connect(self.onSuccess)
             self.worker.onError.connect(self.onUpdateProductError)
             self.worker.start()
         self.update_product_form.show_errors()

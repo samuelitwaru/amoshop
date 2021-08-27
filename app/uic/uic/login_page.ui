@@ -103,6 +103,9 @@
       </item>
       <item>
        <widget class="QLabel" name="waitLabel">
+        <property name="styleSheet">
+         <string notr="true">color:green;</string>
+        </property>
         <property name="text">
          <string/>
         </property>

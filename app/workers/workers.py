@@ -3,6 +3,7 @@ from app import api
 from app.utils import catch_connection_exception
 import requests
 import json
+from app.api import attach_token
 
 
 
@@ -14,7 +15,7 @@ class SendRequestWorker(QThread):
 	
 	def __init__(self, url, request_method, **kwargs):
 		super().__init__()
-		self.url = url
+		self.url = attach_token(url)
 		self.request_method = request_method
 		self.kwargs = kwargs
 

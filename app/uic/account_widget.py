@@ -6,8 +6,10 @@ from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox
 from PyQt5.uic import loadUi
 from app import app
 from app.forms.user import UpdateUserPasswordForm
-from app.workers import UpdateUserPasswordWorker
+from app.workers import SendRequestWorker
 from app.uic.uic.account_widget import Ui_Form
+from app.api import urls
+import requests
 
 
 class AccountWidget(QWidget):
@@ -15,7 +17,7 @@ class AccountWidget(QWidget):
         super(AccountWidget, self).__init__(*args)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
-        self.update_user_password_form = UpdateUserPasswordForm(self.ui.scrollLayout)
+        self.update_user_password_form = UpdateUserPasswordForm(self.ui.scrollLayout, return_func=self.submit)
         self.update_user_password_form.layout_field_widgets()
         self.ui.submitButton.clicked.connect(self.submit)
 
@@ -28,9 +30,9 @@ class AccountWidget(QWidget):
         self.update_user_password_form.form_data = data
         if self.update_user_password_form.validate_form_data():
             user_id = app.user.get("id")
-            self.change_password_worker = UpdateUserPasswordWorker(user_id, data)
+            self.change_password_worker = SendRequestWorker(urls.user_update.format_map({"id": user_id}), requests.put, json=data)
             self.change_password_worker.onStarted.connect(self.onStarted)
-            self.change_password_worker.onSuccess.connect(self.onSuccess)
+            self.change_password_worker.onSuccessDict.connect(self.onSuccess)
             self.change_password_worker.onError.connect(self.onError)
             self.change_password_worker.start()
         self.update_user_password_form.show_errors()
