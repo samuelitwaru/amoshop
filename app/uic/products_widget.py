@@ -1,24 +1,19 @@
-import sys
-import time
-
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QWidget, QDialog, QInputDialog, QLabel, QTableWidgetItem, QHeaderView, QMessageBox
-from PyQt5.uic import loadUi
-from app import app
-from app.workers import SendRequestWorker
-from app.utils import comma_separator
-from app.res.rcc import product
-from app.forms import CreateProductForm, UpdateProductForm
-from app.uic.uic.products_widget import Ui_Form as products_widget_Ui_Form
-from app.uic.uic.create_product_widget import Ui_Form as create_product_widget_Ui_Form
-from app.uic.uic.update_product_widget import Ui_Form as update_product_widget_Ui_Form
 import requests
+from PyQt5.QtWidgets import QWidget, QDialog, QInputDialog, QTableWidgetItem, QHeaderView
 from app.api import urls
+from app.forms import CreateProductForm, UpdateProductForm
+from app.uic.uic.create_product_widget import Ui_Form as create_product_widget_Ui_Form
+from app.uic.uic.products_widget import Ui_Form as products_widget_Ui_Form
+from app.uic.uic.update_product_widget import Ui_Form as update_product_widget_Ui_Form
+from app.utils import comma_separator
+from app.workers import SendRequestWorker
+from app.res.rcc import product
 
 
 class ProductsWidget(QWidget):
     products = []
     product = None
+
     def __init__(self, *args):
         super(ProductsWidget, self).__init__(*args)
         self.ui = products_widget_Ui_Form()
@@ -128,7 +123,7 @@ class CreateProductWidget(QDialog):
         self.create_product_form.form_data = data
         if self.create_product_form.validate_form_data():
             self.create_product_worker = SendRequestWorker(urls.product_list, requests.post, json=data)
-            self.create_product_worker.onStarted.connect(lambda: self.ui.progressLabel.setText("Loading ..."))
+            self.create_product_worker.started.connect(lambda: self.ui.progressLabel.setText("Loading ..."))
             self.create_product_worker.onSuccessList.connect(self.load_products)
             self.create_product_worker.onError.connect(self.onCreateProductError)
             self.create_product_worker.start()
@@ -177,7 +172,7 @@ class UpdateProductWidget(QDialog):
         self.update_product_form.form_data = data
         if self.update_product_form.validate_form_data():
             self.worker = SendRequestWorker(urls.product.format_map({"id": self.product.get("id")}), requests.put, json=data)
-            self.worker.onStarted.connect(self.onStarted)
+            self.worker.started.connect(self.onStarted)
             self.worker.onSuccessList.connect(self.onSuccess)
             self.worker.onError.connect(self.onUpdateProductError)
             self.worker.start()

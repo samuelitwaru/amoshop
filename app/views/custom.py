@@ -1,8 +1,7 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QLineEdit, QLabel, QVBoxLayout, QPushButton, QFrame, QWidget
+from PyQt5.QtGui import QIcon, QPixmap, QPainter
+from PyQt5.QtCore import QRect, Qt, QPropertyAnimation, pyqtProperty
 
-from app.res.style import *
 
 class LineEdit(QWidget):
     label = None
@@ -66,20 +65,32 @@ class Vertical(QFrame):
         self.setFrameShadow(QFrame.Raised)
 
 
-class Spinner(QLabel):
-
+class Spinner(QWidget):
     def __init__(self, parent=None):
-        super(Spinner, self).__init__(parent)
-        # self.setPixmap(QIcon('app/res/icons/loading.gif').pixmap(50, 50))
-        # self.setStyleSheet(f"{p_5}{bg_primary}")
-        self.setText("- - - - - - - - - -")
-        self.do_anim()
+        super().__init__(parent)
+        self.pixmap = QPixmap('app/res/icons/spinner.png')
+        self.setFixedSize(100, 100)
+        self._angle = 0
 
-    def do_anim(self):
-        self.anim = QPropertyAnimation(self, b"pos")
-        self.anim.setDuration(2000)
-        self.anim.setStartValue(QPoint(-400, 40))
-        self.anim.setEndValue(QPoint(600, 40))
-        self.anim.setLoopCount(-1)
+        self.animation = QPropertyAnimation(self, b"angle", self)
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(360)
+        self.animation.setLoopCount(-1)
+        self.animation.setDuration(1200)
+        self.animation.start()
 
-        self.anim.start()
+    @pyqtProperty(int)
+    def angle(self):
+        return self._angle
+
+    @angle.setter
+    def angle(self, value):
+        self._angle = value
+        self.update()
+
+    def paintEvent(self, ev=None):
+        painter = QPainter(self)
+        painter.translate(50, 50)
+        painter.rotate(self._angle)
+        painter.translate(0, 0)
+        painter.drawPixmap(0, 0, self.pixmap)

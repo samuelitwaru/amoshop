@@ -1,15 +1,11 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QTableWidgetItem, QTableWidget, QMessageBox, QHeaderView, QPushButton
-from PyQt5.uic import loadUi
-from PyQt5.QtCore import pyqtSignal, QThread
-from PyQt5.QtGui import *
-from app.utils import comma_separator
-from app import app
-# from app.workers import SearchProductWorker, CheckoutWorker, GetProductsWorker
+import requests
+from PyQt5.QtGui import QIntValidator
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QMessageBox, QHeaderView, QPushButton
+from app.api import urls
 from app.models import session, Product, product_schema, load_products
 from app.uic.uic.selling_widget import Ui_Form
+from app.utils import comma_separator
 from app.workers import SendRequestWorker
-from app.api import urls
-import requests
 
 
 class SellingWidget(QWidget):
@@ -54,13 +50,6 @@ class SellingWidget(QWidget):
         self.ui.amountLineEdit.setValidator(QIntValidator(self.ui.amountLineEdit))
         self.ui.amountLineEdit.textChanged.connect(self.setBalance)
         self.ui.amountLineEdit.returnPressed.connect(self.checkout)
-        
-    def search_product(self):
-        query_string = self.ui.searchLineEdit.text()
-        if query_string:
-            self.worker = SearchProductWorker(query_string)
-            self.worker.onSuccess.connect(self.onSearchResult)
-            self.worker.start()
 
     def search_product_2(self):
         query_string = self.ui.searchLineEdit.text()

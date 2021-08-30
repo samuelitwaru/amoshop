@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from app.uic import TopBar
 from app.views.main_menu import MainMenu
 from app.views.page_frame import PageFrame

@@ -112,13 +112,3 @@ class UpdateProductForm(Form):
             "widget": w.QLineEdit,
         }
     }
-
-    # def __init__(self, product, **kwargs):
-    #     Form.__init__(Form, **kwargs)
-    #     self.fields["name"]["default"] = product["name"]
-    #     self.fields["brand"]["default"] = product["brand"]
-    #     self.fields["description"]["default"] = product["description"]
-    #     self.fields["barcode"]["default"] = product["barcode"]
-    #     self.fields["buying_price"]["default"] = product["buying_price"]
-    #     self.fields["selling_price"]["default"] = product["selling_price"]
-    #     self.fields["units"]["default"] = product["units"]

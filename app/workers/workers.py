@@ -8,10 +8,10 @@ from app.api import attach_token
 
 
 class SendRequestWorker(QThread):
-	onStarted = pyqtSignal()
 	onSuccessDict = pyqtSignal(dict)
 	onSuccessList = pyqtSignal(list)
 	onError = pyqtSignal(dict)
+	onException = pyqtSignal(str)
 	
 	def __init__(self, url, request_method, **kwargs):
 		super().__init__()
@@ -21,7 +21,6 @@ class SendRequestWorker(QThread):
 
 	@catch_connection_exception
 	def run(self):
-		self.onStarted.emit()
 		res = self.request_method(self.url, **self.kwargs)
 		data = json.loads(res.text)
 		if res.status_code == 200:

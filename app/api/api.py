@@ -1,5 +1,3 @@
-import requests
-import json
 from app import app
 from urllib.parse import urlparse, urlencode, parse_qsl, urlunparse
 
@@ -8,6 +6,7 @@ host = "http://127.0.0.1:5000"
 host = "http://itwarusamuel.pythonanywhere.com"
 pref = "/shop/api/v1.0"
 url_start = f"{host}{pref}"
+
 
 def attach_token(url):
 	user = app.user
@@ -19,7 +18,7 @@ def attach_token(url):
 		return urlunparse(url_parts)
 	else:
 		return url
-	
+
 
 ERRORS = {
     400: "Bad Request",

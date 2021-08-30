@@ -19,7 +19,7 @@ def set_widget_value(widget, value):
 		widget.setText(str(value))
 
 
-def get_widget_value(widget_data):
+def get_widget_value(widget):
 	if isinstance(widget, (QLineEdit, QPasswordEdit)):
 		return widget.text()
 	elif isinstance(widget, (QTextEdit)):
@@ -49,6 +49,4 @@ def render_widget(widget_data):
 	field_layout.addWidget(label_widget)
 	field_layout.addWidget(input_widget)
 	field_layout.addWidget(error_widget)
-	
-	
 	return label_widget, input_widget, error_widget, field_layout

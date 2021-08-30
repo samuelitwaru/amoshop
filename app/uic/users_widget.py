@@ -1,21 +1,16 @@
-import sys
-import time
-
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QWidget, QLabel, QTableWidgetItem, QHeaderView, QMessageBox
-from PyQt5.uic import loadUi
-from app import app
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QMessageBox
 from app.utils import render_list
-from app.forms.user import UpdateUserPasswordForm, CreateUserForm
+from app.forms.user import CreateUserForm
 from app.workers import SendRequestWorker
 from app.uic.uic.users_widget import Ui_Form
-from app.res.rcc import user
 from app.api import urls
 import requests
+from app.res.rcc import user
 
 
 class UsersWidget(QWidget):
     users = []
+
     def __init__(self, *args):
         super(UsersWidget, self).__init__(*args)
         self.ui = Ui_Form()
@@ -59,7 +54,7 @@ class UsersWidget(QWidget):
         self.create_user_form.form_data = data
         if self.create_user_form.validate_form_data():
             self.create_user_worker = SendRequestWorker(urls.user_list, requests.post, json=data)
-            self.create_user_worker.onStarted.connect(self.onStarted)
+            self.create_user_worker.started.connect(self.onStarted)
             self.create_user_worker.onSuccessList.connect(self.onSuccess)
             self.create_user_worker.onError.connect(self.onError)
             self.create_user_worker.start()

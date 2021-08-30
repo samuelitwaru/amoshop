@@ -1,5 +1,6 @@
 import re
 
+
 class IsRequired:
     
     def __init__(self, msg="This field is required"):
@@ -9,6 +10,7 @@ class IsRequired:
         if bool(str_data):
             return True, str_data
         return False, self.msg
+
 
 class Email:
     

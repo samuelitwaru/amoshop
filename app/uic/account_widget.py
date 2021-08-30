@@ -1,9 +1,4 @@
-import sys
-import time
-
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QWidget, QLabel, QMessageBox
-from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QWidget, QMessageBox
 from app import app
 from app.forms.user import UpdateUserPasswordForm
 from app.workers import SendRequestWorker
@@ -31,7 +26,7 @@ class AccountWidget(QWidget):
         if self.update_user_password_form.validate_form_data():
             user_id = app.user.get("id")
             self.change_password_worker = SendRequestWorker(urls.user_update.format_map({"id": user_id}), requests.put, json=data)
-            self.change_password_worker.onStarted.connect(self.onStarted)
+            self.change_password_worker.started.connect(self.onStarted)
             self.change_password_worker.onSuccessDict.connect(self.onSuccess)
             self.change_password_worker.onError.connect(self.onError)
             self.change_password_worker.start()

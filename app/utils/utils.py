@@ -1,7 +1,4 @@
 from datetime import datetime
-from PyQt5.QtCore import QFile
-from PyQt5.uic import loadUiType
-
 
 
 def combine_styles(style_list):
@@ -19,9 +16,9 @@ def clear_layout(layout):
 
 
 def comma_separator(value):
-	if isinstance(value, int):
-		return f'{value:,}'
-	return value
+    if isinstance(value, int):
+        return f'{value:,}'
+    return value
 
 
 def format_from_iso_date(iso_date, format='%d/%m/%Y %H:%M'):
@@ -32,13 +29,4 @@ def render_list(string_list):
     output = "<ul>"
     for string in string_list:
         output += f"<li>{string}</li>"
-    return output+"</ul"
-
-
-def loadUiClass(path):
-    stream = QFile(path)
-    stream.open(QFile.ReadOnly)
-    try:
-        return loadUiType(stream)[0]
-    finally:
-        stream.close()
+    return output + "</ul"

@@ -1,10 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker, scoped_session
 from app import Config
-
 
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, echo=False)
 # engine = create_engine('sqlite:///:memory:', echo=True)
@@ -13,16 +11,18 @@ Base = declarative_base()
 
 
 class Product(Base):
-	__tablename__ = 'products'
-	id = Column(Integer, primary_key=True)
-	name = Column(String, nullable=False)
-	brand = Column(String, nullable=False)
-	description = Column(String, nullable=False)
-	barcode = Column(String, unique=True)
-	quantity = Column(Integer, nullable=False, default=0)
-	units = Column(String, nullable=False)
-	buying_price = Column(Integer, nullable=False)
-	selling_price = Column(Integer, nullable=False)
+    __tablename__ = 'products'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    brand = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    barcode = Column(String, unique=True)
+    quantity = Column(Integer, nullable=False, default=0)
+    units = Column(String, nullable=False)
+    buying_price = Column(Integer, nullable=False)
+    selling_price = Column(Integer, nullable=False)
+
+
 # 	stock = relationship("Stock", backref="product")
 # 	sales = relationship("Sale", backref="product")
 
@@ -52,6 +52,7 @@ class Product(Base):
 # 	sales = relationship("Sale", backref="sale")
 
 session = scoped_session(sessionmaker(bind=engine))
+
 
 def create_db():
     Base.metadata.create_all(bind=engine)

@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtWidgets import QFrame, QVBoxLayout
+from PyQt5.QtCore import QSize
 from app.views.custom import ImageButton
 
-from app.res.style import *
 from app import app
 from app.res.rcc import icons
 

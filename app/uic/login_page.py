@@ -1,18 +1,12 @@
-import sys
-import time
 import requests
-from PyQt5.QtWidgets import QWidget, QDialog, QLabel, QMessageBox
-from PyQt5.uic import loadUi, loadUiType
-from app.views.main_page import MainPage
-from app.workers import SendRequestWorker
+from PyQt5.QtWidgets import QWidget, QDialog, QMessageBox
 from app import app
+from app.api import urls
 from app.forms import LoginForm, RegisterAsAdminForm
-from app.uic.uic import login_page
-from app.utils import loadUiClass
 from app.uic.uic.login_page import Ui_Form
 from app.uic.uic.register_admin import Ui_Form as register_admin_Ui_Form
-from app.api import urls
-
+from app.views.main_page import MainPage
+from app.workers import SendRequestWorker
 
 
 class LoginPage(QWidget):
@@ -35,7 +29,8 @@ class LoginPage(QWidget):
         self.login_form.form_data = data
         if self.login_form.validate_form_data():
             self.login_worker = SendRequestWorker(urls.user_auth, requests.post, json=data)
-            self.login_worker.onStarted.connect(self.onLoginStarted)
+            self.login_worker.started.connect(self.onLoginStarted)
+            self.login_worker.finished.connect(lambda: self.ui.waitLabel.setText(""))
             self.login_worker.onSuccessDict.connect(self.onLoginSuccess)
             self.login_worker.onError.connect(self.onLoginError)
             self.login_worker.start()
@@ -60,15 +55,14 @@ class LoginPage(QWidget):
         if reply == QMessageBox.Ok:
             self.ui.waitLabel.setText("")  
 
-
     def show_register_admin(self, users):
         if len(users) == 0:
             self.register_admin = RegisterAdmin()
             self.register_admin.show()  
 
 
-
 class RegisterAdmin(QDialog):
+
     def __init__(self, *args):
         super(RegisterAdmin, self).__init__(*args)
         self.ui = register_admin_Ui_Form()
@@ -76,7 +70,6 @@ class RegisterAdmin(QDialog):
         self.ui.submitButton.clicked.connect(self.submit)
         self.register_as_admin_form = RegisterAsAdminForm(self.ui.scrollLayout)
         self.register_as_admin_form.layout_field_widgets()
-
 
     def submit(self):
         data = {
@@ -90,9 +83,9 @@ class RegisterAdmin(QDialog):
         }
         self.register_as_admin_form.form_data = data
         if self.register_as_admin_form.validate_form_data():
-            self.worker = CreateUserWorker(data)
-            self.worker.onStarted.connect(self.onStarted)
-            self.worker.onSuccess.connect(self.onSuccess)
+            self.worker = SendRequestWorker(urls.user_list, requests.post, json=data)
+            self.worker.started.connect(self.onStarted)
+            self.worker.onSuccessList.connect(self.onSuccess)
             self.worker.onError.connect(self.onError)
             self.worker.start()
         self.register_as_admin_form.show_errors()

@@ -1,9 +1,6 @@
-from PyQt5 import QtWidgets as w
-from PyQt5.QtCore import Qt
-from .data import STYLES
 from .utils import validator_in_validators, set_widget_value, render_widget
 from .validators import IsRequired
-from app.utils import clear_layout, render_list
+from app.utils import render_list
 
 
 class Form:
@@ -33,7 +30,7 @@ class Form:
 						self.errors[field_name] = data
 		
 		if len(self.errors):
-		    return False
+			return False
 		return True
 
 	def process_form_data(self):
@@ -70,7 +67,6 @@ class Form:
 				if isinstance(error, list):
 					error = render_list(error)
 			error_label.setText(error)
-
 
 	def clear(self):
 		for key, value in self.form_data.items():

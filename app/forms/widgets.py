@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QLineEdit, QWidget, QVBoxLayout, QCheckBox
 from PyQt5.QtGui import QIntValidator
+
 
 class QPasswordEdit(QLineEdit):
 
@@ -25,22 +26,22 @@ class QSelect(QWidget):
         self.layout_choice_widgets()
 
     def layout_choice_widgets(self):
-    	for k, v in self.choices.items():
-    		label = v.get("label")
-    		checked = v.get("checked")
-    		cb = QCheckBox(label)
-    		cb.setChecked(bool(checked))
-    		self.layout.addWidget(cb)
-    		self.choices[k]["widget"] = cb
+        for k, v in self.choices.items():
+            label = v.get("label")
+            checked = v.get("checked")
+            cb = QCheckBox(label)
+            cb.setChecked(bool(checked))
+            self.layout.addWidget(cb)
+            self.choices[k]["widget"] = cb
 
     def clear(self):
         pass
 
     def get_data(self):
-    	data = dict()
-    	for k, v in self.choices.items():
-    		checked = self.choices[k]["widget"].isChecked()
-    		if checked:
-    			data[k] = checked
-    	return data
+        data = dict()
+        for k, v in self.choices.items():
+            checked = self.choices[k]["widget"].isChecked()
+            if checked:
+                data[k] = checked
+        return data
 

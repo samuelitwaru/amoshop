@@ -1,5 +1,4 @@
 from marshmallow import Schema, fields
-from datetime import date
 
 
 class ProductSchema(Schema):

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QStackedWidget
+from PyQt5.QtWidgets import QStackedWidget
 from app.uic import ProductsWidget
 from app.uic import SalesWidget
 from app.uic import SellingWidget

@@ -1,11 +1,9 @@
-from PyQt5.QtWidgets import *
-from PyQt5.uic import loadUi
-from PyQt5.QtCore import pyqtSignal, QThread
-from app.workers import SendRequestWorker
-from app.utils import comma_separator, format_from_iso_date
-from app.uic.uic.sales_widget import Ui_Form
-from app.api import urls
 import requests
+from PyQt5.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QWidget
+from app.api import urls
+from app.uic.uic.sales_widget import Ui_Form
+from app.utils import comma_separator, format_from_iso_date
+from app.workers import SendRequestWorker
 
 
 class SalesWidget(QWidget):

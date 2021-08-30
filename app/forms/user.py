@@ -111,7 +111,6 @@ class UpdateUserPasswordForm(Form):
     }
 
 
-
 class RegisterAsAdminForm(Form):
     
     fields = {
